@@ -1,19 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Datamaps from 'datamaps';
+import ExtendedDatamaps from './extendedDatamaps';
 
-const MAP_CLEARING_PROPS = [
-	'height', 'scope', 'setProjection', 'width'
-];
+const MAP_CLEARING_PROPS = ['height', 'scope', 'setProjection', 'width'];
 
 const propChangeRequiresMapClear = (oldProps, newProps) => {
-	return MAP_CLEARING_PROPS.some((key) =>
-		oldProps[key] !== newProps[key]
-	);
+	return MAP_CLEARING_PROPS.some(key => oldProps[key] !== newProps[key]);
 };
 
 export default class Datamap extends React.Component {
-
 	static propTypes = {
 		arc: PropTypes.array,
 		arcOptions: PropTypes.object,
@@ -26,7 +21,7 @@ export default class Datamap extends React.Component {
 		responsive: PropTypes.bool,
 		style: PropTypes.object,
 		updateChoroplethOptions: PropTypes.object,
-		width: PropTypes.any
+		width: PropTypes.any,
 	};
 
 	constructor(props) {
@@ -78,16 +73,17 @@ export default class Datamap extends React.Component {
 			graticule,
 			labels,
 			updateChoroplethOptions,
+			onDone,
 			...props
 		} = this.props;
 
 		let map = this.map;
 
 		if (!map) {
-			map = this.map = new Datamaps({
+			map = this.map = new ExtendedDatamaps({
 				...props,
 				data,
-				element: this.refs.container
+				element: this.refs.container,
 			});
 		} else {
 			map.updateChoropleth(data, updateChoroplethOptions);
@@ -108,6 +104,10 @@ export default class Datamap extends React.Component {
 		if (labels) {
 			map.labels();
 		}
+
+		if (onDone) {
+			onDone(map);
+		}
 	}
 
 	resizeMap() {
@@ -119,10 +119,9 @@ export default class Datamap extends React.Component {
 			height: '100%',
 			position: 'relative',
 			width: '100%',
-			...this.props.style
+			...this.props.style,
 		};
 
 		return <div ref="container" style={style} />;
 	}
-
 }
